@@ -12,6 +12,7 @@ const bit<8>  PROTOCOL_UDP = 0x11;
 typedef bit<9>  egressSpec_t;
 typedef bit<48> macAddr_t;
 typedef bit<32> ip4Addr_t;
+typedef bit<16> udpPort_t;
 
 header ethernet_t {
     macAddr_t dstAddr;
@@ -34,8 +35,12 @@ header ipv4_t {
     ip4Addr_t dstAddr;
 }
 
-// TODO: Add new headers here
-//TODO 3
+header udp_t {
+    udpPort_t srcPort;
+    udpPort_t dstPort;
+    bit<16> len;
+    bit<16> checksum;
+}
 
 struct metadata {
     /* empty */
@@ -44,7 +49,7 @@ struct metadata {
 struct headers {
     ethernet_t   ethernet;
     ipv4_t       ipv4;
-    // TODO: Add new headers here
+    udp_t        udp;
 }
 
 /*************************************************************************
