@@ -42,7 +42,7 @@ header udp_t {
     bit<16> checksum;
 }
 
-header memchached_t {
+header memcached_t {
     bit<96> command;
     bit<32> kesyStart;
     bit<8> lastDigit;
@@ -57,7 +57,7 @@ struct headers {
     ethernet_t   ethernet;
     ipv4_t       ipv4;
     udp_t        udp;
-    memchached_t memchached;
+    memcached_t memcached;
 }
 
 /*************************************************************************
@@ -91,11 +91,11 @@ parser MyParser(packet_in packet,
 
     state parse_udp {
         packet.extract(hdr.udp);
-        transition parse_memchached;
+        transition parse_memcached;
     }
 
-    state parse_memchached {
-        packet.extract(hdr.memchached);
+    state parse_memcached {
+        packet.extract(hdr.memcached);
         transition accept;
     }
 
@@ -248,7 +248,7 @@ control MyDeparser(packet_out packet, in headers hdr) {
         packet.emit(hdr.ethernet);
         packet.emit(hdr.ipv4);
         packet.emit(hdr.udp);
-        packet.emit(hdr.memchached);
+        packet.emit(hdr.memcached);
         // TODO: Need to emit other headers
     }
 }
