@@ -233,7 +233,7 @@ control MyComputeChecksum(inout headers  hdr, inout metadata meta) {
             hdr.udp.len,
             hdr.udp.srcPort,
             hdr.udp.dstPort,
-            hdr.udp.len,},
+            hdr.udp.len},
             hdr.udp.checksum,
             HashAlgorithm.csum16);
     }
