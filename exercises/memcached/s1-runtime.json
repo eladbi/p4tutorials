@@ -152,20 +152,12 @@
     },
     {
       "table": "MyIngress.ipv4_src_lpm",
-      "default_action": true,
-      "action_name": "MyIngress.rewrite_ipv4_src",
-      "action_params": {
-        "dstAddr": "10.0.1.1"
-      }
-    },
-    {
-      "table": "MyIngress.ipv4_src_lpm",
       "match": {
         "hdr.ipv4.srcAddr": ["10.0.2.2", 32]
       },
       "action_name": "MyIngress.rewrite_ipv4_src",
       "action_params": {
-        "dstAddr": "10.0.1.1"
+        "srcAddr": "10.0.0.1"
       }
     },
     {
@@ -175,8 +167,8 @@
       },
       "action_name": "MyIngress.rewrite_ipv4_src",
       "action_params": {
-        "dstAddr": "10.0.1.1"
+        "srcAddr": "10.0.0.1"
       }
-    },
+    }
   ]
 }

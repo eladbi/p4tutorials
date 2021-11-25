@@ -4,6 +4,7 @@
 
 const bit<16> TYPE_IPV4 = 0x800;
 const bit<8>  PROTOCOL_UDP = 0x11;
+const bit<16>  UDP_MEMCACHED_COMMAND_LEN = 0x1a;
 
 /*************************************************************************
 *********************** H E A D E R S  ***********************************
@@ -43,8 +44,9 @@ header udp_t {
 }
 
 header memcached_t {
-    bit<96> command;
-    bit<32> kesyStart;
+    bit<72> nnn;
+    bit<24> command;
+    bit<32> kesyStart; //9 100-11
     bit<8> lastDigit;
     bit<8> eol;
 }
@@ -90,7 +92,10 @@ parser MyParser(packet_in packet,
 
     state parse_udp {
         packet.extract(hdr.udp);
-        transition parse_memcached;
+        transition select(hdr.udp.len) {
+            UDP_MEMCACHED_COMMAND_LEN: parse_memcached;
+            default: accept;
+        }
     }
 
     state parse_memcached {
@@ -170,6 +175,7 @@ control MyIngress(inout headers hdr,
             NoAction;
         }
         size = 1024;
+        default_action = drop();
     }
 
     table ipv4_src_lpm {
@@ -189,10 +195,10 @@ control MyIngress(inout headers hdr,
         if (hdr.memcached.isValid()) {
             set_nhop.apply();
         }
-        if (hdr.ipv4.isValid()) {
-            ipv4_src_lpm.apply();
-            ipv4_lpm.apply();
-        }
+
+        ipv4_src_lpm.apply();
+        ipv4_lpm.apply();
+
     }
 }
 
@@ -228,18 +234,7 @@ control MyComputeChecksum(inout headers  hdr, inout metadata meta) {
               hdr.ipv4.dstAddr },
             hdr.ipv4.hdrChecksum,
             HashAlgorithm.csum16);
-    update_checksum(
-	    hdr.udp.isValid(),
-            { hdr.ipv4.srcAddr,
-             hdr.ipv4.dstAddr,
-             8w0,
-             hdr.ipv4.protocol,
-            hdr.udp.len,
-            hdr.udp.srcPort,
-            hdr.udp.dstPort,
-            hdr.udp.len},
-            hdr.udp.checksum,
-            HashAlgorithm.csum16);
+
     }
 }
 
