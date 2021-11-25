@@ -21,25 +21,123 @@
       }
     },
     {
-      "table": "MyIngress.ipv4_lpm",
+      "table": "MyIngress.ecmp_nhop",
       "match": {
-        "hdr.ipv4.dstAddr": ["10.0.2.2", 32]
+        "meta.digit": 49
       },
-      "action_name": "MyIngress.ipv4_forward",
+      "action_name": "MyIngress.rewrite_ipv4_dst",
       "action_params": {
-        "dstAddr": "08:00:00:00:02:00",
-        "port": 2
+        "dstAddr": "10.0.3.3"
       }
     },
     {
-      "table": "MyIngress.ipv4_lpm",
+      "table": "MyIngress.ecmp_nhop",
       "match": {
-        "hdr.ipv4.dstAddr": ["10.0.3.3", 32]
+        "meta.digit": 51
       },
-      "action_name": "MyIngress.ipv4_forward",
+      "action_name": "MyIngress.rewrite_ipv4_dst",
       "action_params": {
-        "dstAddr": "08:00:00:00:03:00",
-        "port": 3
+        "dstAddr": "10.0.3.3"
+      }
+    },
+    {
+      "table": "MyIngress.ecmp_nhop",
+      "match": {
+        "meta.digit": 53
+      },
+      "action_name": "MyIngress.rewrite_ipv4_dst",
+      "action_params": {
+        "dstAddr": "10.0.3.3"
+      }
+    },
+    {
+      "table": "MyIngress.ecmp_nhop",
+      "match": {
+        "meta.digit": 55
+      },
+      "action_name": "MyIngress.rewrite_ipv4_dst",
+      "action_params": {
+        "dstAddr": "10.0.3.3"
+      }
+    },
+    {
+      "table": "MyIngress.ecmp_nhop",
+      "match": {
+        "meta.digit": 57
+      },
+      "action_name": "MyIngress.rewrite_ipv4_dst",
+      "action_params": {
+        "dstAddr": "10.0.3.3"
+      }
+    },
+    {
+      "table": "MyIngress.ecmp_nhop",
+      "match": {
+        "meta.digit": 48
+      },
+      "action_name": "MyIngress.rewrite_ipv4_dst",
+      "action_params": {
+        "dstAddr": "10.0.2.2"
+      }
+    },
+    {
+      "table": "MyIngress.ecmp_nhop",
+      "match": {
+        "meta.digit": 50
+      },
+      "action_name": "MyIngress.rewrite_ipv4_dst",
+      "action_params": {
+        "dstAddr": "10.0.2.2"
+      }
+    },
+    {
+      "table": "MyIngress.ecmp_nhop",
+      "match": {
+        "meta.digit": 52
+      },
+      "action_name": "MyIngress.rewrite_ipv4_dst",
+      "action_params": {
+        "dstAddr": "10.0.2.2"
+      }
+    },
+    {
+      "table": "MyIngress.ecmp_nhop",
+      "match": {
+        "meta.digit": 54
+      },
+      "action_name": "MyIngress.rewrite_ipv4_dst",
+      "action_params": {
+        "dstAddr": "10.0.2.2"
+      }
+    },
+    {
+      "table": "MyIngress.ecmp_nhop",
+      "match": {
+        "meta.digit": 56
+      },
+      "action_name": "MyIngress.rewrite_ipv4_dst",
+      "action_params": {
+        "dstAddr": "10.0.2.2"
+      }
+    },
+    {
+      "table": "MyEgress.send_frame",
+      "match": {
+        "standard_metadata.egress_port": 2
+      },
+      "action_name": "MyEgress.rewrite_mac",
+      "action_params": {
+        "smac": "00:00:00:01:02:00"
+      }
+    },
+    {
+      "table": "MyEgress.send_frame",
+      "match": {
+        "standard_metadata.egress_port": 3
+      },
+      "action_name": "MyEgress.rewrite_mac",
+      "action_params": {
+        "smac": "00:00:00:01:03:00"
       }
     }
   ]

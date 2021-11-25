@@ -4,6 +4,7 @@
 
 const bit<16> TYPE_IPV4 = 0x800;
 const bit<8>  PROTOCOL_UDP = 0x11;
+const bit<8>  PROTOCOL_UDP = 0x11;
 
 /*************************************************************************
 *********************** H E A D E R S  ***********************************
@@ -42,14 +43,22 @@ header udp_t {
     bit<16> checksum;
 }
 
+header memchached_t {
+    bit<96> command;
+    bit<32> kesyStart;
+    bit<8> lastDigit;
+    bit<8> eol;
+}
+
 struct metadata {
-    /* empty */
+    bit<8> digit;
 }
 
 struct headers {
     ethernet_t   ethernet;
     ipv4_t       ipv4;
     udp_t        udp;
+    memchached_t memchached;
 }
 
 /*************************************************************************
@@ -76,9 +85,21 @@ parser MyParser(packet_in packet,
     state parse_ipv4 {
         packet.extract(hdr.ipv4);
         transition select(hdr.ipv4.protocol) {
+            PROTOCOL_UDP: parse_udp;
             default: accept;
         }
     }
+
+    state parse_udp {
+        packet.extract(hdr.udp);
+        transition parse_memchached;
+    }
+
+    state parse_memchached {
+        packet.extract(hdr.memchached);
+        transition accept;
+    }
+
 }
 
 /*************************************************************************
@@ -106,15 +127,18 @@ control MyIngress(inout headers hdr,
         hdr.ethernet.srcAddr = hdr.ethernet.dstAddr;
         hdr.ethernet.dstAddr = dstAddr;
         hdr.ipv4.ttl = hdr.ipv4.ttl - 1;
+        meta.digit = hdr.memcached.lastDigit;
     }
 
     action rewrite_ipv4_dst(ip4Addr_t dstAddr) {
         bit<32> original_dstAddr;
 
         // TODO: Complete here
+        original_dstAddr = hdr.ipv4.dstAddr;
+        hdr.ipv4.dstAddr = dstAddr;
 
         // TODO: Correct the UDP checksum. Use the following pseudo-code and adapt it to your implementation:
-        // hdr.udp.checksum = hdr.udp.checksum - (bit<16>)(dstAddr - original_dstAddr);
+        hdr.udp.checksum = hdr.udp.checksum - (bit<16>)(dstAddr - original_dstAddr);
     }
 
     table ipv4_lpm {
@@ -128,6 +152,18 @@ control MyIngress(inout headers hdr,
         }
         size = 1024;
         default_action = drop();
+    }
+
+    table set_nhop {
+        key = {
+            meta.digit: exect;
+        }
+        actions = {
+            rewrite_ipv4_dst;
+            drop;
+            NoAction;
+        }
+        size = 1024;
     }
 
     // TODO: Add new tables here
@@ -147,7 +183,25 @@ control MyIngress(inout headers hdr,
 control MyEgress(inout headers hdr,
                  inout metadata meta,
                  inout standard_metadata_t standard_metadata) {
-    apply {  }
+    action rewrite_mac(bit<48> smac) {
+        hdr.ethernet.srcAddr = smac;
+    }
+    action drop() {
+        mark_to_drop(standard_metadata);
+    }
+    table send_frame {
+        key = {
+            standard_metadata.egress_port: exact;
+        }
+        actions = {
+            rewrite_mac;
+            drop;
+        }
+        size = 256;
+    }
+    apply {
+        send_frame.apply();
+    }
 }
 
 /*************************************************************************
@@ -171,6 +225,18 @@ control MyComputeChecksum(inout headers  hdr, inout metadata meta) {
               hdr.ipv4.dstAddr },
             hdr.ipv4.hdrChecksum,
             HashAlgorithm.csum16);
+    update_checksum(
+	    hdr.udp.isValid(),
+            { hdr.ipv4.srcAddr,
+             hdr.ipv4.dstAddr,
+             8'0,
+             ipv4.protocol;
+            udp.len;
+            udp.srcPort;
+            udp.dstPort;
+            udp.len;},
+            hdr.udp.checksum,
+            HashAlgorithm.csum16);
     }
 }
 
@@ -182,6 +248,8 @@ control MyDeparser(packet_out packet, in headers hdr) {
     apply {
         packet.emit(hdr.ethernet);
         packet.emit(hdr.ipv4);
+        packet.emit(hdr.udp);
+        packet.emit(hdr.memchached);
         // TODO: Need to emit other headers
     }
 }
