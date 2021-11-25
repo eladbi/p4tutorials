@@ -41,6 +41,142 @@
         "dstAddr": "08:00:00:00:03:00",
         "port": 3
       }
-    }
+    },
+    {
+      "table": "MyIngress.set_nhop",
+      "match": {
+        "hdr.memcached.lastDigit": 49
+      },
+      "action_name": "MyIngress.rewrite_ipv4_dst",
+      "action_params": {
+        "dstAddr": "10.0.3.3"
+      }
+    },
+    {
+      "table": "MyIngress.set_nhop",
+      "match": {
+        "hdr.memcached.lastDigit": 51
+      },
+      "action_name": "MyIngress.rewrite_ipv4_dst",
+      "action_params": {
+        "dstAddr": "10.0.3.3"
+      }
+    },
+    {
+      "table": "MyIngress.set_nhop",
+      "match": {
+        "hdr.memcached.lastDigit": 53
+      },
+      "action_name": "MyIngress.rewrite_ipv4_dst",
+      "action_params": {
+        "dstAddr": "10.0.3.3"
+      }
+    },
+    {
+      "table": "MyIngress.set_nhop",
+      "match": {
+        "hdr.memcached.lastDigit": 55
+      },
+      "action_name": "MyIngress.rewrite_ipv4_dst",
+      "action_params": {
+        "dstAddr": "10.0.3.3"
+      }
+    },
+    {
+      "table": "MyIngress.set_nhop",
+      "match": {
+        "hdr.memcached.lastDigit": 57
+      },
+      "action_name": "MyIngress.rewrite_ipv4_dst",
+      "action_params": {
+        "dstAddr": "10.0.3.3"
+      }
+    },
+    {
+      "table": "MyIngress.set_nhop",
+      "match": {
+        "hdr.memcached.lastDigit": 48
+      },
+      "action_name": "MyIngress.rewrite_ipv4_dst",
+      "action_params": {
+        "dstAddr": "10.0.2.2"
+      }
+    },
+    {
+      "table": "MyIngress.set_nhop",
+      "match": {
+        "hdr.memcached.lastDigit": 50
+      },
+      "action_name": "MyIngress.rewrite_ipv4_dst",
+      "action_params": {
+        "dstAddr": "10.0.2.2"
+      }
+    },
+    {
+      "table": "MyIngress.set_nhop",
+      "match": {
+        "hdr.memcached.lastDigit": 52
+      },
+      "action_name": "MyIngress.rewrite_ipv4_dst",
+      "action_params": {
+        "dstAddr": "10.0.2.2"
+      }
+    },
+    {
+      "table": "MyIngress.set_nhop",
+      "match": {
+        "hdr.memcached.lastDigit": 54
+      },
+      "action_name": "MyIngress.rewrite_ipv4_dst",
+      "action_params": {
+        "dstAddr": "10.0.2.2"
+      }
+    },
+    {
+      "table": "MyIngress.set_nhop",
+      "match": {
+        "hdr.memcached.lastDigit": 56
+      },
+      "action_name": "MyIngress.rewrite_ipv4_dst",
+      "action_params": {
+        "dstAddr": "10.0.2.2"
+      }
+    },
+    {
+      "table": "MyIngress.set_nhop",
+      "default_action": true,
+      "action_name": "MyIngress.rewrite_ipv4_dst",
+      "action_params": {
+        "dstAddr": "10.0.2.2"
+      }
+    },
+    {
+      "table": "MyIngress.ipv4_src_lpm",
+      "default_action": true,
+      "action_name": "MyIngress.rewrite_ipv4_src",
+      "action_params": {
+        "dstAddr": "10.0.1.1"
+      }
+    },
+    {
+      "table": "MyIngress.ipv4_src_lpm",
+      "match": {
+        "hdr.ipv4.srcAddr": ["10.0.2.2", 32]
+      },
+      "action_name": "MyIngress.rewrite_ipv4_src",
+      "action_params": {
+        "dstAddr": "10.0.1.1"
+      }
+    },
+    {
+      "table": "MyIngress.ipv4_src_lpm",
+      "match": {
+        "hdr.ipv4.srcAddr": ["10.0.3.3", 32]
+      },
+      "action_name": "MyIngress.rewrite_ipv4_src",
+      "action_params": {
+        "dstAddr": "10.0.1.1"
+      }
+    },
   ]
 }

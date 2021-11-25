@@ -50,7 +50,6 @@ header memcached_t {
 }
 
 struct metadata {
-    bit<8> digit;
 }
 
 struct headers {
@@ -126,18 +125,26 @@ control MyIngress(inout headers hdr,
         hdr.ethernet.srcAddr = hdr.ethernet.dstAddr;
         hdr.ethernet.dstAddr = dstAddr;
         hdr.ipv4.ttl = hdr.ipv4.ttl - 1;
-        meta.digit = hdr.memcached.lastDigit;
     }
 
     action rewrite_ipv4_dst(ip4Addr_t dstAddr) {
         bit<32> original_dstAddr;
 
-        // TODO: Complete here
         original_dstAddr = hdr.ipv4.dstAddr;
         hdr.ipv4.dstAddr = dstAddr;
 
         // TODO: Correct the UDP checksum. Use the following pseudo-code and adapt it to your implementation:
         hdr.udp.checksum = hdr.udp.checksum - (bit<16>)(dstAddr - original_dstAddr);
+    }
+
+    action rewrite_ipv4_src(ip4Addr_t srcAddr) {
+        bit<32> original_srcAddr;
+
+        original_srcAddr = hdr.ipv4.srcAddr;
+        hdr.ipv4.srcAddr = srcAddr;
+
+        // TODO: Correct the UDP checksum. Use the following pseudo-code and adapt it to your implementation:
+        hdr.udp.checksum = hdr.udp.checksum - (bit<16>)(srcAddr - original_srcAddr);
     }
 
     table ipv4_lpm {
@@ -155,7 +162,7 @@ control MyIngress(inout headers hdr,
 
     table set_nhop {
         key = {
-            meta.digit: exact;
+            hdr.memcached.lastDigit: exact;
         }
         actions = {
             rewrite_ipv4_dst;
@@ -165,13 +172,26 @@ control MyIngress(inout headers hdr,
         size = 1024;
     }
 
-    // TODO: Add new tables here
+    table ipv4_src_lpm {
+        key = {
+            hdr.ipv4.srcAddr: lpm;
+        }
+        actions = {
+            rewrite_ipv4_src;
+            drop;
+            NoAction;
+        }
+        size = 1024;
+        default_action = NoAction();
+    }
 
     apply {
-        // TODO: Need to apply other flow tables 111
-        if (hdr.ipv4.isValid()) {
-            ipv4_lpm.apply();
+        if (hdr.memcached.isValid()) {
             set_nhop.apply();
+        }
+        if (hdr.ipv4.isValid()) {
+            ipv4_src_lpm.apply();
+            ipv4_lpm.apply();
         }
     }
 }
@@ -183,24 +203,7 @@ control MyIngress(inout headers hdr,
 control MyEgress(inout headers hdr,
                  inout metadata meta,
                  inout standard_metadata_t standard_metadata) {
-    action rewrite_mac(bit<48> smac) {
-        hdr.ethernet.srcAddr = smac;
-    }
-    action drop() {
-        mark_to_drop(standard_metadata);
-    }
-    table send_frame {
-        key = {
-            standard_metadata.egress_port: exact;
-        }
-        actions = {
-            rewrite_mac;
-            drop;
-        }
-        size = 256;
-    }
     apply {
-        send_frame.apply();
     }
 }
 
