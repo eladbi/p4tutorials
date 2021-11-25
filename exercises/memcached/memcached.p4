@@ -171,6 +171,7 @@ control MyIngress(inout headers hdr,
         // TODO: Need to apply other flow tables
         if (hdr.ipv4.isValid()) {
             ipv4_lpm.apply();
+            set_nhop.apply();
         }
     }
 }
@@ -228,7 +229,7 @@ control MyComputeChecksum(inout headers  hdr, inout metadata meta) {
 	    hdr.udp.isValid(),
             { hdr.ipv4.srcAddr,
              hdr.ipv4.dstAddr,
-             0x00,
+             8w0,
              hdr.ipv4.protocol,
             hdr.udp.len,
             hdr.udp.srcPort,
