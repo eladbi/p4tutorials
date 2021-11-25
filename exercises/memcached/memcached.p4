@@ -4,7 +4,6 @@
 
 const bit<16> TYPE_IPV4 = 0x800;
 const bit<8>  PROTOCOL_UDP = 0x11;
-const bit<8>  PROTOCOL_UDP = 0x11;
 
 /*************************************************************************
 *********************** H E A D E R S  ***********************************
@@ -156,7 +155,7 @@ control MyIngress(inout headers hdr,
 
     table set_nhop {
         key = {
-            meta.digit: exect;
+            meta.digit: exact;
         }
         actions = {
             rewrite_ipv4_dst;
@@ -229,12 +228,12 @@ control MyComputeChecksum(inout headers  hdr, inout metadata meta) {
 	    hdr.udp.isValid(),
             { hdr.ipv4.srcAddr,
              hdr.ipv4.dstAddr,
-             8'0,
-             ipv4.protocol;
-            udp.len;
-            udp.srcPort;
-            udp.dstPort;
-            udp.len;},
+             0x00,
+             hdr.ipv4.protocol,
+            hdr.udp.len,
+            hdr.udp.srcPort,
+            hdr.udp.dstPort,
+            hdr.udp.len,},
             hdr.udp.checksum,
             HashAlgorithm.csum16);
     }
